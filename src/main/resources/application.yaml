@@ -1,9 +1,9 @@
 spring:
   datasource:
-    driver-class-name: org.h2.Driver
-    url: jdbc:h2:mem:bloodbank
-    username: user
-    password: password
+    driver-class-name: { DATABASE_DRIVER }
+    url: { DATABASE_URL }
+    username: { DATABASE_USERNAME }
+    password: { DATABASE_PASSWORD }
 
   jpa:
     hibernate:
@@ -16,5 +16,6 @@ spring:
       path: /h2-console
 
 server:
+  port: 8080
   servlet:
     context-path: /api/v1
