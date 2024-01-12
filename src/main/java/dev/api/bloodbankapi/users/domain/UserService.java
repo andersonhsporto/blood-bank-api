@@ -1,15 +1,16 @@
 package dev.api.bloodbankapi.users.domain;
 
 import dev.api.bloodbankapi.users.exceptions.UserNotFoundException;
-import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Service;
 
 @Service
 @AllArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+  private final UserRepository userRepository;
 
 
   public UserDto create(UserDto dto) {
@@ -32,4 +33,9 @@ public class UserService {
 
     return UserDto.fromEntityList(userEntities);
   }
+
+  public ResponseEntity<UserDto> getUserById(Long id) {
+    return null;
+  }
+
 }

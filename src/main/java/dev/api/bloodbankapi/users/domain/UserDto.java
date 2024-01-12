@@ -3,6 +3,7 @@ package dev.api.bloodbankapi.users.domain;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.api.bloodbankapi.users.base.RoleEnum;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
@@ -27,8 +28,12 @@ public record UserDto(
     @JsonProperty("password")
     String password,
 
+    @JsonInclude(Include.NON_NULL)
+    @JsonProperty("role")
+    RoleEnum role,
+
     @NotNull(message = "Date of birth is required")
-    @JsonProperty("dateOfBirth")
+    @JsonProperty("date_of_birth")
     LocalDate dateOfBirth
 ) {
 

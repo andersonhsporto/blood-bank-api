@@ -1,4 +1,11 @@
 spring:
+  security:
+    jwt:
+      secret-key: ${JWT_SECRET_KEY}
+      expiration: ${JWT_EXPIRATION}
+      refresh-token:
+        expiration: ${JWT_REFRESH_TOKEN_EXPIRATION}
+
   datasource:
     driver-class-name: ${DATABASE_DRIVER}
     url: ${DATABASE_URL}
@@ -15,7 +22,7 @@ spring:
       enabled: false
       path: /h2-console
 
-  mvc :
+  mvc:
     pathmatch:
       matching-strategy: ant_path_matcher
 
@@ -28,5 +35,4 @@ springdoc:
   swagger-ui:
     path: swagger-ui-custom.html
     operationsSorter: method
-
 
