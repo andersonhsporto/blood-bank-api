@@ -2,9 +2,14 @@ package dev.api.bloodbankapi.auth.web;
 
 import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import dev.api.bloodbankapi.auth.domain.AuthDTO;
+import dev.api.bloodbankapi.auth.domain.AuthService;
+import dev.api.bloodbankapi.auth.domain.SignupDTO;
 import dev.api.bloodbankapi.configuration.JwtService;
+import dev.api.bloodbankapi.users.domain.UserDto;
 import java.io.IOException;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -26,6 +31,8 @@ public class AuthController {
 
   private final UserDetailsService userDetailsService;
 
+  private final AuthService authService;
+
   @PostMapping("/auth")
   public String createAuthenticationToken(@RequestBody AuthDTO authenticationDTO, HttpServletResponse response) throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException {
     try {
@@ -41,6 +48,16 @@ public class AuthController {
 
     return jwtService.generateToken(userDetails);
 
+  }
+
+  @PostMapping("sign-up")
+  public ResponseEntity<?> signupUser(@RequestBody SignupDTO signupDTO) {
+    UserDto createdUser = authService.createUser(signupDTO);
+
+    if (createdUser == null) {
+      return new ResponseEntity<>("User not created", HttpStatus.BAD_REQUEST);
+    }
+    return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
   }
 
 

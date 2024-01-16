@@ -41,14 +41,14 @@ public class UserEntity extends BaseEntity implements UserDetails {
   @Column(name = "password", nullable = false)
   private String password;
 
-  @Column(name = "date_of_birth", nullable = false)
+  @Column(name = "date_of_birth", nullable = true)
   private LocalDate dateOfBirth;
 
   @Column(name = "email", unique = true, nullable = false)
   private String email;
 
   @Enumerated(EnumType.STRING)
-  @Column(name = "role", nullable = false)
+  @Column(name = "role", nullable = true)
   private RoleEnum role;
 
   @OneToMany(mappedBy = "user")
