@@ -3,6 +3,7 @@ package dev.api.bloodbankapi.users.domain;
 import dev.api.bloodbankapi.users.exceptions.UserNotFoundException;
 import java.util.List;
 import lombok.AllArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -34,8 +35,19 @@ public class UserService {
     return UserDto.fromEntityList(userEntities);
   }
 
-  public ResponseEntity<UserDto> getUserById(Long id) {
-    return null;
+  public ResponseEntity<?> getUserById(Long id) throws UserNotFoundException {
+    var user = userRepository.findById(id).orElseThrow(
+        () -> new UserNotFoundException(
+            String.format(
+                "User with id [%d] not found",
+                id
+            )
+        )
+    );
+
+    UserDto dto = UserDto.fromEntity(user);
+
+    return new ResponseEntity<>(dto, HttpStatus.OK);
   }
 
 }

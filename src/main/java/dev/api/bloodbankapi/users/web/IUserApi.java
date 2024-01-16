@@ -2,6 +2,7 @@ package dev.api.bloodbankapi.users.web;
 
 import dev.api.bloodbankapi.base.ApiUtil;
 import dev.api.bloodbankapi.users.domain.UserDto;
+import dev.api.bloodbankapi.users.exceptions.UserNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -52,13 +53,14 @@ public interface IUserApi {
       value = {"/user/{id}"},
       produces = {"application/json"}
   )
-  default ResponseEntity<UserDto> _getBeerById(
-      @Parameter(name = "id", description = "Id of user in database", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id) {
+  default ResponseEntity<?> _getBeerById(
+      @Parameter(name = "id", description = "Id of user in database", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id)
+      throws UserNotFoundException {
     return this.getUserById(id);
   }
 
   // Function to override
-  default ResponseEntity<UserDto> getUserById(Long id) {
+  default ResponseEntity<?> getUserById(Long id) throws UserNotFoundException {
     this.getRequest().ifPresent((request) -> {
       Iterator var1 = MediaType.parseMediaTypes(request.getHeader("Accept")).iterator();
 
