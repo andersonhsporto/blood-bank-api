@@ -1,11 +1,11 @@
 package dev.api.bloodbankapi.auth.web;
 
-import com.nimbusds.openid.connect.sdk.AuthenticationResponse;
 import dev.api.bloodbankapi.auth.domain.AuthDTO;
 import dev.api.bloodbankapi.auth.domain.AuthService;
 import dev.api.bloodbankapi.auth.domain.SignupDTO;
 import dev.api.bloodbankapi.configuration.JwtService;
 import dev.api.bloodbankapi.users.domain.UserDto;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
-import jakarta.servlet.http.HttpServletResponse;
+
 @AllArgsConstructor
 @RestController
 public class AuthController {
@@ -34,9 +34,13 @@ public class AuthController {
   private final AuthService authService;
 
   @PostMapping("/auth")
-  public String createAuthenticationToken(@RequestBody AuthDTO authenticationDTO, HttpServletResponse response) throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException {
+  public String createAuthenticationToken(@RequestBody AuthDTO authenticationDTO,
+      HttpServletResponse response)
+      throws BadCredentialsException, DisabledException, UsernameNotFoundException, IOException {
     try {
-      authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(authenticationDTO.email(), authenticationDTO.password()));
+      authenticationManager.authenticate(
+          new UsernamePasswordAuthenticationToken(authenticationDTO.email(),
+              authenticationDTO.password()));
     } catch (BadCredentialsException e) {
       throw new BadCredentialsException("Incorrect username or password!");
     } catch (DisabledException disabledException) {
@@ -44,7 +48,8 @@ public class AuthController {
       return null;
     }
 
-    final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationDTO.email());
+    final UserDetails userDetails = userDetailsService.loadUserByUsername(
+        authenticationDTO.email());
 
     return jwtService.generateToken(userDetails);
 

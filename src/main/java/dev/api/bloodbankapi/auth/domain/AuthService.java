@@ -7,12 +7,6 @@ import dev.api.bloodbankapi.users.domain.UserRepository;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.AllArgsConstructor;
-import lombok.extern.java.Log;
-import org.apache.catalina.User;
-import org.springframework.cglib.core.Local;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 

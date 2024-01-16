@@ -1,7 +1,6 @@
 package dev.api.bloodbankapi.auth.domain;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import java.time.LocalDate;
 
 public record SignupDTO(
     String name,
