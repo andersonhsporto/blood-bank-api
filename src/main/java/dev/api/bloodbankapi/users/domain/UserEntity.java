@@ -57,7 +57,7 @@ public class UserEntity extends BaseEntity implements UserDetails {
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
     Collection<? extends GrantedAuthority> authorities = List.of(() -> role.name());
-    System.out.println("authorities = " + authorities);
+
     return authorities;
   }
 

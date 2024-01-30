@@ -16,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 public class SecurityConfiguration {
 
   private static final String[] PUBLIC_MATCHERS = {
-      "/public/**"
+      "/auth"
   };
 
   private final JwtAuthenticationFilter jwtAuthenticationFilter;
@@ -27,7 +27,7 @@ public class SecurityConfiguration {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(
             authCfg -> {
-              authCfg.requestMatchers("/auth").permitAll();
+              authCfg.requestMatchers(PUBLIC_MATCHERS).permitAll();
               authCfg.requestMatchers("/sign-up").hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name(), RoleEnum.DONOR.name());
               authCfg.requestMatchers("/admin-sign-up").hasAuthority(RoleEnum.ADMIN.name());
               authCfg.requestMatchers("/user/**").hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name(), RoleEnum.DONOR.name());
