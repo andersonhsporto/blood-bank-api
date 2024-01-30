@@ -56,7 +56,9 @@ public class UserEntity extends BaseEntity implements UserDetails {
 
   @Override
   public Collection<? extends GrantedAuthority> getAuthorities() {
-    return null;
+    Collection<? extends GrantedAuthority> authorities = List.of(() -> role.name());
+    System.out.println("authorities = " + authorities);
+    return authorities;
   }
 
   @Override
@@ -77,5 +79,17 @@ public class UserEntity extends BaseEntity implements UserDetails {
   @Override
   public boolean isEnabled() {
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "UserEntity{" +
+        "name='" + name + '\'' +
+        ", username='" + username + '\'' +
+        ", password='" + password + '\'' +
+        ", dateOfBirth=" + dateOfBirth +
+        ", email='" + email + '\'' +
+        ", role=" + role +
+        '}';
   }
 }

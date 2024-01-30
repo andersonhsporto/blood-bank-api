@@ -41,4 +41,25 @@ public class AuthService {
     return UserDto.fromEntity(user);
   }
 
+  public UserDto createBasicUser(SignupDTO signupDTO) {
+    if (userRepository.findByEmailAndUsername(signupDTO.email(), signupDTO.email()).isPresent()) {
+      return null;
+    }
+
+    UserEntity user = SignupDTO.toEntity(signupDTO);
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    LocalDate date = LocalDate.parse(signupDTO.localDate(), formatter);
+
+    user.setDateOfBirth(date);
+    user.setRole(RoleEnum.USER);
+
+    String password = new BCryptPasswordEncoder().encode(signupDTO.password());
+
+    user.setPassword(password);
+
+    userRepository.save(user);
+
+    return UserDto.fromEntity(user);
+  }
 }

@@ -14,6 +14,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.DisabledException;
@@ -21,12 +22,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 @AllArgsConstructor
 @RestController
+@CrossOrigin("*") //TODO REMOVE THIS BEFORE DEPLOYMENT
 public class AuthController {
 
   private final JwtService jwtService;
@@ -64,7 +67,7 @@ public class AuthController {
 
   }
 
-  @PostMapping("sign-up")
+  @PostMapping("admin-sign-up")
   public ResponseEntity<?> signupUser(@RequestBody SignupDTO signupDTO) {
     UserDto createdUser = authService.createUser(signupDTO);
 
@@ -72,7 +75,21 @@ public class AuthController {
       return new ResponseEntity<>("User not created", HttpStatus.BAD_REQUEST);
     }
 
-    Logger.getLogger("AuthController").info("User created: " + signupDTO.email());
+    Logger.getLogger("AuthController").info("User created: " + createdUser.id());
+    return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
+  }
+
+  @PostMapping("sign-up")
+  public ResponseEntity<?> signupBasicUser(@RequestBody SignupDTO signupDTO) {
+    Logger.getLogger("AuthController").info("attempting to create user");
+    UserDto createdUser = authService.createBasicUser(signupDTO);
+
+    if (createdUser == null) {
+      Logger.getLogger("AuthController").info("User not created");
+      return new ResponseEntity<>("User not created", HttpStatus.BAD_REQUEST);
+    }
+
+    Logger.getLogger("AuthController").info("User created: " + createdUser.id());
     return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
   }
 

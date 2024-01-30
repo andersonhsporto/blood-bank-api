@@ -1,5 +1,6 @@
 package dev.api.bloodbankapi.configuration;
 
+import dev.api.bloodbankapi.users.base.RoleEnum;
 import lombok.AllArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,7 +27,10 @@ public class SecurityConfiguration {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(
             authCfg -> {
-              authCfg.requestMatchers("/sign-up", "/auth").permitAll();
+              authCfg.requestMatchers("/auth").permitAll();
+              authCfg.requestMatchers("/sign-up").hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name(), RoleEnum.DONOR.name());
+              authCfg.requestMatchers("/admin-sign-up").hasAuthority(RoleEnum.ADMIN.name());
+              authCfg.requestMatchers("/user/**").hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name(), RoleEnum.DONOR.name());
               authCfg.anyRequest().authenticated();
             })
         .sessionManagement(
