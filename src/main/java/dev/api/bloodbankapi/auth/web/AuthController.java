@@ -5,9 +5,13 @@ import dev.api.bloodbankapi.auth.domain.AuthService;
 import dev.api.bloodbankapi.auth.domain.SignupDTO;
 import dev.api.bloodbankapi.configuration.JwtService;
 import dev.api.bloodbankapi.users.domain.UserDto;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.logging.Logger;
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -51,7 +55,12 @@ public class AuthController {
     final UserDetails userDetails = userDetailsService.loadUserByUsername(
         authenticationDTO.email());
 
-    return jwtService.generateToken(userDetails);
+    response.setHeader(
+        "Authorization",
+        "Bearer " + jwtService.generateToken(userDetails));
+
+    Logger.getLogger("AuthController").info("User logged in: " + userDetails.getUsername());
+    return "OK";
 
   }
 
@@ -62,6 +71,8 @@ public class AuthController {
     if (createdUser == null) {
       return new ResponseEntity<>("User not created", HttpStatus.BAD_REQUEST);
     }
+
+    Logger.getLogger("AuthController").info("User created: " + signupDTO.email());
     return new ResponseEntity<>(createdUser, HttpStatus.CREATED);
   }
 
