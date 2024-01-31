@@ -76,9 +76,9 @@ public class AuthController {
   }
 
   @PostMapping("sign-up")
-  public ResponseEntity<?> signupBasicUser(@RequestBody SignupDTO signupDTO) {
+  public ResponseEntity<?> signupDonorUser(@RequestBody SignupDTO signupDTO) {
     Logger.getLogger("AuthController").info("attempting to create user");
-    UserDto createdUser = authService.createBasicUser(signupDTO);
+    UserDto createdUser = authService.signupDonorUser(signupDTO);
 
     if (createdUser == null) {
       Logger.getLogger("AuthController").info("User not created");
