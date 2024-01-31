@@ -3,6 +3,7 @@ package dev.api.bloodbankapi.users.domain;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import dev.api.bloodbankapi.users.base.BloodTypeEnum;
 import dev.api.bloodbankapi.users.base.RoleEnum;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -34,7 +35,10 @@ public record UserDto(
 
     @NotNull(message = "Date of birth is required")
     @JsonProperty("date_of_birth")
-    LocalDate dateOfBirth
+    LocalDate dateOfBirth,
+
+    @JsonProperty("blood_type")
+    BloodTypeEnum bloodType
 ) {
 
   public static UserEntity toEntity(UserDto dto) {
@@ -54,6 +58,7 @@ public record UserDto(
         .username(userEntity.getUsername())
         .password(null)
         .dateOfBirth(userEntity.getDateOfBirth())
+        .bloodType(userEntity.getBloodType())
         .build();
   }
 

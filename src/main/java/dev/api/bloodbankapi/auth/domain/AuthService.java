@@ -17,18 +17,15 @@ public class AuthService {
   private final UserRepository userRepository;
 
   public UserDto createUser(SignupDTO dto) {
-    UserEntity user = new UserEntity();
-
-    user.setName(dto.name());
-    user.setEmail(dto.email());
-    user.setUsername(dto.email());
+    if (userRepository.findByEmail(dto.email()).isPresent()) {
+      return null;
+    }
+    UserEntity user = SignupDTO.toEntity(dto);
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     LocalDate date = LocalDate.parse(dto.localDate(), formatter);
 
     user.setDateOfBirth(date);
-
-    user.setRole(RoleEnum.ADMIN);
 
     String password = new BCryptPasswordEncoder().encode(dto.password());
 
@@ -36,13 +33,11 @@ public class AuthService {
 
     userRepository.save(user);
 
-    System.out.println("rt");
-
     return UserDto.fromEntity(user);
   }
 
-  public UserDto createBasicUser(SignupDTO signupDTO) {
-    if (userRepository.findByEmailAndUsername(signupDTO.email(), signupDTO.email()).isPresent()) {
+  public UserDto signupDonorUser(SignupDTO signupDTO) {
+    if (userRepository.findByEmail(signupDTO.email()).isPresent()) {
       return null;
     }
 
@@ -52,7 +47,7 @@ public class AuthService {
     LocalDate date = LocalDate.parse(signupDTO.localDate(), formatter);
 
     user.setDateOfBirth(date);
-    user.setRole(RoleEnum.USER);
+    user.setRole(RoleEnum.DONOR);
 
     String password = new BCryptPasswordEncoder().encode(signupDTO.password());
 

@@ -15,6 +15,18 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @AllArgsConstructor
 public class SecurityConfiguration {
 
+  private static final String[] ADMIN_MATCHERS = {
+      "/admin-sign-up",
+  };
+
+  private static final String[] USER_MATCHERS = {
+      "/user/{id}/bloodtype/{bloodType}"
+  };
+
+  private static final String[] DONOR_MATCHERS = {
+      "/sign-up"
+  };
+
   private static final String[] PUBLIC_MATCHERS = {
       "/auth"
   };
@@ -27,10 +39,10 @@ public class SecurityConfiguration {
         .csrf(csrf -> csrf.disable())
         .authorizeHttpRequests(
             authCfg -> {
+              authCfg.requestMatchers(ADMIN_MATCHERS).hasAuthority(RoleEnum.ADMIN.name());
+              authCfg.requestMatchers(USER_MATCHERS).hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name());
+              authCfg.requestMatchers(DONOR_MATCHERS).hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name(), RoleEnum.DONOR.name());
               authCfg.requestMatchers(PUBLIC_MATCHERS).permitAll();
-              authCfg.requestMatchers("/sign-up").hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name(), RoleEnum.DONOR.name());
-              authCfg.requestMatchers("/admin-sign-up").hasAuthority(RoleEnum.ADMIN.name());
-              authCfg.requestMatchers("/user/**").hasAnyAuthority(RoleEnum.ADMIN.name(), RoleEnum.USER.name(), RoleEnum.DONOR.name());
               authCfg.anyRequest().authenticated();
             })
         .sessionManagement(

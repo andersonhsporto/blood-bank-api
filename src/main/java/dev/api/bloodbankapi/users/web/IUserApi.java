@@ -2,7 +2,7 @@ package dev.api.bloodbankapi.users.web;
 
 import dev.api.bloodbankapi.base.ApiUtil;
 import dev.api.bloodbankapi.users.domain.UserDto;
-import dev.api.bloodbankapi.users.exceptions.UserNotFoundException;
+import dev.api.bloodbankapi.users.exceptions.PasswordUserNotFoundException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.ParameterIn;
@@ -55,12 +55,63 @@ public interface IUserApi {
   )
   default ResponseEntity<?> _getBeerById(
       @Parameter(name = "id", description = "Id of user in database", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id)
-      throws UserNotFoundException {
+      throws PasswordUserNotFoundException {
     return this.getUserById(id);
   }
 
   // Function to override
-  default ResponseEntity<?> getUserById(Long id) throws UserNotFoundException {
+  default ResponseEntity<?> getUserById(Long id) throws PasswordUserNotFoundException {
+    this.getRequest().ifPresent((request) -> {
+      Iterator var1 = MediaType.parseMediaTypes(request.getHeader("Accept")).iterator();
+
+      while (var1.hasNext()) {
+        MediaType mediaType = (MediaType) var1.next();
+        String exampleString;
+        if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
+          exampleString = "{ \"id\" : \"id\", \"name\" : \"name\", \"username\" : \"username\", \"role\" : \"role\", \"date_of_birth\" : \"date_of_birth\" }";
+          ApiUtil.setExampleResponse(request, "application/json", exampleString);
+          break;
+        }
+      }
+
+    });
+    return new ResponseEntity(HttpStatus.NOT_IMPLEMENTED);
+  }
+
+  @Operation(
+      operationId = "updateBloodType",
+      summary = "Update blood type",
+      description = "Updates the blood type of a user",
+      tags = {"user"},
+
+      responses = {@ApiResponse(
+          responseCode = "200",
+          description = "Successful operation",
+          content = {@Content(
+              mediaType = "application/json",
+              schema = @Schema(
+                  implementation = UserDto.class
+              )
+          )}
+      ), @ApiResponse(
+          responseCode = "404",
+          description = "User not found"
+      )}
+  )
+  @RequestMapping(
+      method = {RequestMethod.PUT},
+      value = {"/user/{id}/bloodtype/{bloodType}"},
+      produces = {"application/json"}
+  )
+  default ResponseEntity<?> _updateBloodType(
+      @Parameter(name = "id", description = "Id of user in database", required = true, in = ParameterIn.PATH) @PathVariable("id") Long id,
+      @Parameter(name = "bloodType", description = "Blood type of user", required = true, in = ParameterIn.PATH) @PathVariable("bloodType") String bloodType)
+      throws PasswordUserNotFoundException {
+    return this.updateBloodType(id, bloodType);
+  }
+
+  // Function to override
+  default ResponseEntity<?> updateBloodType(Long id, String bloodType) throws PasswordUserNotFoundException {
     this.getRequest().ifPresent((request) -> {
       Iterator var1 = MediaType.parseMediaTypes(request.getHeader("Accept")).iterator();
 

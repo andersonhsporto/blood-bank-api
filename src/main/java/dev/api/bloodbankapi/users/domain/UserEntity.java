@@ -3,6 +3,7 @@ package dev.api.bloodbankapi.users.domain;
 
 import dev.api.bloodbankapi.auth.domain.TokenEntity;
 import dev.api.bloodbankapi.base.BaseEntity;
+import dev.api.bloodbankapi.users.base.BloodTypeEnum;
 import dev.api.bloodbankapi.users.base.RoleEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -50,6 +51,10 @@ public class UserEntity extends BaseEntity implements UserDetails {
   @Enumerated(EnumType.STRING)
   @Column(name = "role", nullable = true)
   private RoleEnum role;
+
+  @Enumerated(EnumType.ORDINAL)
+  @Column(name = "blood_type", nullable = true)
+  private BloodTypeEnum bloodType;
 
   @OneToMany(mappedBy = "user")
   private List<TokenEntity> tokens;

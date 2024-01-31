@@ -1,10 +1,12 @@
 package dev.api.bloodbankapi.users.domain;
 
-import dev.api.bloodbankapi.users.exceptions.UserNotFoundException;
+import dev.api.bloodbankapi.users.base.BloodTypeEnum;
+import dev.api.bloodbankapi.users.exceptions.PasswordUserNotFoundException;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -13,17 +15,8 @@ public class UserService {
 
   private final UserRepository userRepository;
 
-
-  public UserDto create(UserDto dto) {
-    var UserEntity = UserDto.toEntity(dto);
-    // TODO: inject password encoder and encode password
-
-    userRepository.save(UserEntity);
-    return UserDto.fromEntity(UserEntity);
-  }
-
-  public UserDto get(Long id) throws UserNotFoundException {
-    var userEntity = userRepository.findById(id).orElseThrow(UserNotFoundException::new);
+  public UserDto get(Long id) throws PasswordUserNotFoundException {
+    var userEntity = userRepository.findById(id).orElseThrow(PasswordUserNotFoundException::new);
 
     return UserDto.fromEntity(userEntity);
   }
@@ -35,9 +28,9 @@ public class UserService {
     return UserDto.fromEntityList(userEntities);
   }
 
-  public ResponseEntity<?> getUserById(Long id) throws UserNotFoundException {
+  public ResponseEntity<?> getUserById(Long id) throws PasswordUserNotFoundException {
     var user = userRepository.findById(id).orElseThrow(
-        () -> new UserNotFoundException(
+        () -> new PasswordUserNotFoundException(
             String.format(
                 "User with id [%d] not found",
                 id
@@ -50,4 +43,24 @@ public class UserService {
     return new ResponseEntity<>(dto, HttpStatus.OK);
   }
 
+  @PreAuthorize("hasAnyAuthority({'ADMIN', 'USER'})")
+  public ResponseEntity<?> updateBloodType(Long id, String bloodType)
+      throws PasswordUserNotFoundException {
+    UserEntity user = userRepository.findById(id).orElseThrow(
+        () -> new PasswordUserNotFoundException(
+            String.format(
+                "User with id [%d] not found",
+                id
+            )
+        )
+    );
+
+    BloodTypeEnum bloodTypeEnum = BloodTypeEnum.valueOf(bloodType);
+
+    user.setBloodType(bloodTypeEnum);
+
+    userRepository.save(user);
+
+    return new ResponseEntity<>(HttpStatus.OK);
+  }
 }
