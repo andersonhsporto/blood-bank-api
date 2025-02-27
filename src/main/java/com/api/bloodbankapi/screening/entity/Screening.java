@@ -2,7 +2,6 @@ package com.api.bloodbankapi.screening.entity;
 
 import com.api.bloodbankapi.commons.enums.ScreeningStatus;
 import com.api.bloodbankapi.donor.entity.Donor;
-import com.api.bloodbankapi.question.entity.Question;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,7 +12,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -34,9 +33,8 @@ public class Screening {
     @JoinColumn(name = "donor_id")
     private Donor donor;
 
-    @ElementCollection
-    @Column(name = "questions", nullable = false)
-    private Map<Question, String> questions;
+    @OneToMany(mappedBy = "screening", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ScreeningQuestion> questions;
 
     private LocalDateTime date;
 
@@ -50,4 +48,8 @@ public class Screening {
 
     @UpdateTimestamp
     private Instant lastUpdatedOn;
+
+    public void setQuestions(List<ScreeningQuestion> screeningQuestions) {
+        this.questions = screeningQuestions;
+    }
 }

@@ -2,7 +2,9 @@ package com.api.bloodbankapi.screening.controller;
 
 import com.api.bloodbankapi.screening.dto.ProtocolDTO;
 import com.api.bloodbankapi.screening.dto.ScreeningDTO;
+import com.api.bloodbankapi.screening.dto.ScreeningQuestionDTO;
 import com.api.bloodbankapi.screening.service.ScreeningService;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
@@ -45,6 +47,12 @@ public class ScreeningController {
     public List<ScreeningDTO> getScreeningsPage(@RequestParam int page, @RequestParam int size) {
         log.info("Finding screenings page: {} size: {}", page, size);
         return service.findPage(page, size);
+    }
+
+    @GetMapping("/question/{protocol}")
+    public List<ScreeningQuestionDTO> getScreeningQuestions(@PathVariable @NotNull String protocol) {
+        log.info("Finding screening questions by protocol: {}", protocol);
+        return service.findScreeningQuestions(protocol);
     }
 
 }

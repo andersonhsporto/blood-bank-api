@@ -3,10 +3,13 @@ package com.api.bloodbankapi.screening.service;
 import com.api.bloodbankapi.commons.enums.ScreeningStatus;
 import com.api.bloodbankapi.commons.exception.DonorAlreadyScreenedCustomException;
 import com.api.bloodbankapi.commons.exception.DonorNotFoundCustomException;
+import com.api.bloodbankapi.commons.exception.ScreeningNotFoundCustomException;
 import com.api.bloodbankapi.donor.entity.Donor;
 import com.api.bloodbankapi.donor.repository.DonorRepository;
 import com.api.bloodbankapi.question.entity.Question;
 import com.api.bloodbankapi.question.repository.QuestionRepository;
+import com.api.bloodbankapi.screening.dto.ScreeningQuestionDTO;
+import com.api.bloodbankapi.screening.entity.ScreeningQuestion;
 import com.api.bloodbankapi.screening.repository.ScreeningPagingRepository;
 import com.api.bloodbankapi.screening.repository.ScreeningRepository;
 import com.api.bloodbankapi.screening.dto.ProtocolDTO;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -56,7 +60,7 @@ public class ScreeningService {
 
     public ScreeningDTO findScreeningByProtocol(String protocol) {
         var screeningEntity = screeningRepository.findByProtocol(protocol)
-                .orElseThrow(() -> new DonorNotFoundCustomException("Screening not found with protocol: " + protocol));
+                .orElseThrow(() -> new ScreeningNotFoundCustomException("Screening not found with protocol: " + protocol));
 
         return new ScreeningDTO(
                 screeningEntity.getId().toString(),
@@ -65,12 +69,14 @@ public class ScreeningService {
                 screeningEntity.getDate(),
                 screeningEntity.getStatus().name(),
                 screeningEntity.getDonor().getObservation(),
-                screeningEntity.getQuestions().values().stream().allMatch(String::isBlank)
+                false
         );
     }
 
     public List<ScreeningDTO> findActiveScreenings() {
-        return screeningRepository.findByStatus(ScreeningStatus.PENDING).stream()
+        return screeningRepository
+                .findByStatus(ScreeningStatus.PENDING)
+                .stream()
                 .map(screeningEntity -> new ScreeningDTO(
                         screeningEntity.getId().toString(),
                         screeningEntity.getDonor().getName(),
@@ -78,7 +84,7 @@ public class ScreeningService {
                         screeningEntity.getDate(),
                         screeningEntity.getStatus().name(),
                         screeningEntity.getDonor().getObservation(),
-                        screeningEntity.getQuestions().values().stream().allMatch(String::isBlank)
+                        false
                 ))
                 .collect(Collectors.toList());
     }
@@ -92,7 +98,7 @@ public class ScreeningService {
                         screeningEntity.getDate(),
                         screeningEntity.getStatus().name(),
                         screeningEntity.getDonor().getObservation(),
-                        screeningEntity.getQuestions().values().stream().allMatch(String::isBlank)
+                        false
                 ))
                 .collect(Collectors.toList());
     }
@@ -108,28 +114,35 @@ public class ScreeningService {
                         screeningEntity.getDate(),
                         screeningEntity.getStatus().name(),
                         screeningEntity.getDonor().getObservation(),
-                        screeningEntity.getQuestions().values().stream().allMatch(String::isBlank)
+                        false
                 ))
                 .collect(Collectors.toList());
     }
 
     private Screening generateScreening(Donor donorEntity) {
         String protocol = protocolGenerator(donorEntity.getName(), donorEntity.getDocumentId());
-        List<Question> questions = findActiveQuestions();
-        Map<Question, String> screeningQuestions = createScreeningQuestions(questions);
-
-        return Screening.builder()
+        Screening screeningEntity = Screening.builder()
                 .protocol(protocol)
                 .donor(donorEntity)
-                .questions(screeningQuestions)
                 .date(LocalDateTime.now())
                 .status(ScreeningStatus.PENDING)
                 .build();
+        List<ScreeningQuestion> screeningQuestions = createScreeningQuestions(screeningEntity);
+
+        screeningEntity.setQuestions(screeningQuestions);
+        return screeningEntity;
     }
 
-    private Map<Question, String> createScreeningQuestions(List<Question> questions) {
+    private List<ScreeningQuestion> createScreeningQuestions(Screening screeningEntity) {
+        List<Question> questions = findActiveQuestions();
+
         return questions.stream()
-                .collect(Collectors.toMap(question -> question, question -> ""));
+                .map(question -> ScreeningQuestion.builder()
+                        .question(question)
+                        .screening(screeningEntity)
+                        .isAnswered(false)
+                        .build())
+                .collect(Collectors.toList());
     }
 
     private List<Question> findActiveQuestions() {
@@ -155,5 +168,22 @@ public class ScreeningService {
                 now.getSecond());
     }
 
+    public List<ScreeningQuestionDTO> findScreeningQuestions(String protocol) {
+        var screeningEntity = screeningRepository.findByProtocol(protocol)
+                .orElseThrow(() -> new ScreeningNotFoundCustomException("Screening not found with protocol: " + protocol));
+
+        Map<String, String> questionsAndAnswers = screeningEntity.getQuestions().stream()
+                .collect(Collectors.toMap(
+                        screeningQuestion -> screeningQuestion.getQuestion().getQuestionText(),
+                        screeningQuestion -> Optional.ofNullable(screeningQuestion.getAnswer()).orElse("")
+                ));
+
+        boolean answeredAllQuestions = screeningEntity.getQuestions().stream()
+                .allMatch(ScreeningQuestion::getIsAnswered);
+
+        return questionsAndAnswers.entrySet().stream()
+                .map(entry -> new ScreeningQuestionDTO(questionsAndAnswers, answeredAllQuestions))
+                .toList();
+    }
 }
 

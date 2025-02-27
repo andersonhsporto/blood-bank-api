@@ -2,7 +2,7 @@ package com.api.bloodbankapi.commons.exception;
 
 public class DonorAlreadyScreenedCustomException extends RuntimeException {
 
-    private static final String RETURN_MESSAGE = "Donor already screened";
+    private static final String RETURN_MESSAGE = "Donor already screened today";
 
     private static final String CODE = "S_001";
 
