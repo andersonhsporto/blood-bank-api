@@ -73,6 +73,15 @@
             <scope>runtime</scope>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-websocket</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.webjars</groupId>
+            <artifactId>sockjs-client</artifactId>
+            <version>1.5.0</version>
+        </dependency>
+        <dependency>
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>8.0.0.Final</version>
@@ -161,16 +170,14 @@
             </properties>
         </profile>
         <profile>
-            <id>DOCKER</id>
+            <id>POSTGRES</id>
             <properties>
-                <spring.profiles.active>DOCKER</spring.profiles.active>
-                <spring.datasource.url>jdbc:h2:mem:test</spring.datasource.url>
-                <spring.datasource.driverClassName>org.h2.Driver</spring.datasource.driverClassName>
-                <spring.datasource.username>sa</spring.datasource.username>
-                <spring.datasource.password></spring.datasource.password>
-                <spring.jpa.database-platform>org.hibernate.dialect.H2Dialect</spring.jpa.database-platform>
-                <spring.h2.console.enabled>true</spring.h2.console.enabled>
-                <spring.h2.console.path>/h2-console</spring.h2.console.path>
+                <spring.profiles.active>POSTGRES</spring.profiles.active>
+                <spring.datasource.url>jdbc:postgresql://localhost:${POSTGRES_PORT:5432}/${POSTGRES_DB:postgres}</spring.datasource.url>
+                <spring.datasource.driverClassName>org.postgresql.Driver</spring.datasource.driverClassName>
+                <spring.datasource.username>${POSTGRES_USER:postgres}</spring.datasource.username>
+                <spring.datasource.password>${POSTGRES_PASSWORD:postgres}</spring.datasource.password>
+                <spring.jpa.database-platform>org.hibernate.dialect.PostgreSQLDialect</spring.jpa.database-platform>
             </properties>
         </profile>
     </profiles>
