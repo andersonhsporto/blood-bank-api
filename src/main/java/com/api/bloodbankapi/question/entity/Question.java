@@ -39,6 +39,9 @@ public class Question {
     @UpdateTimestamp
     private Instant lastUpdatedOn;
 
+    @Version
+    private int version;
+
     public void updateFromEntity(Question entity) {
         this.code = entity.getCode();
         this.questionText = entity.getQuestionText();

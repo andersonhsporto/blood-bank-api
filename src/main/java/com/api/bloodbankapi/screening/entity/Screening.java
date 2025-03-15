@@ -49,6 +49,9 @@ public class Screening {
     @UpdateTimestamp
     private Instant lastUpdatedOn;
 
+    @Version
+    private int version;
+
     public void setQuestions(List<ScreeningQuestion> screeningQuestions) {
         this.questions = screeningQuestions;
     }

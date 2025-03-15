@@ -64,6 +64,9 @@ public class Donor {
     @UpdateTimestamp
     private Instant lastUpdatedOn;
 
+    @Version
+    private int version;
+
     public void updateFromEntity(Donor donor) {
         this.name = donor.getName();
         this.email = donor.getEmail();
