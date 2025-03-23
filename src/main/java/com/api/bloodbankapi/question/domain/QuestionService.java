@@ -3,7 +3,7 @@ package com.api.bloodbankapi.question.domain;
 import com.api.bloodbankapi.commons.exception.QuestionDuplicatedCustomException;
 import com.api.bloodbankapi.commons.exception.QuestionNotFoundCustomException;
 import com.api.bloodbankapi.question.entity.Question;
-import com.api.bloodbankapi.question.entity.QuestionDTO;
+import com.api.bloodbankapi.question.entity.QuestionRequest;
 import com.api.bloodbankapi.question.repository.QuestionRepository;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,8 +21,8 @@ public class QuestionService {
 
     private final QuestionRepository jpaRepository;
 
-    public void save(QuestionDTO questionDTO) {
-        Question entity = QuestionDTO.toEntity(questionDTO);
+    public void save(QuestionRequest questionRequest) {
+        Question entity = QuestionRequest.toEntity(questionRequest);
 
         if (jpaRepository.existsByCodeAndQuestionText(entity.getCode(), entity.getQuestionText())) {
             throw new QuestionDuplicatedCustomException();
@@ -31,33 +31,33 @@ public class QuestionService {
         jpaRepository.save(entity);
     }
 
-    public QuestionDTO findByCode(String code) {
+    public QuestionRequest findByCode(String code) {
         Question entity = jpaRepository.findByCode(code)
                 .orElseThrow(() -> new QuestionNotFoundCustomException());
 
-        return QuestionDTO.fromEntity(entity);
+        return QuestionRequest.fromEntity(entity);
     }
 
-    public List<QuestionDTO> findAll() {
+    public List<QuestionRequest> findAll() {
         return jpaRepository.findAll()
                 .stream()
-                .map(QuestionDTO::fromEntity)
+                .map(QuestionRequest::fromEntity)
                 .toList();
     }
 
-    public List<QuestionDTO> findPage(int page, int size) {
+    public List<QuestionRequest> findPage(int page, int size) {
         Page<Question> questionPage = jpaRepository.findAll(PageRequest.of(page, size, Sort.by("code")));
 
         return questionPage.stream()
-                .map(QuestionDTO::fromEntity)
+                .map(QuestionRequest::fromEntity)
                 .toList();
     }
 
-    public void update(String code, QuestionDTO questionDTO) {
+    public void update(String code, QuestionRequest questionRequest) {
         Question question = jpaRepository.findByCode(code)
                 .orElseThrow(() -> new QuestionNotFoundCustomException());
 
-        Question entity = QuestionDTO.toEntity(questionDTO);
+        Question entity = QuestionRequest.toEntity(questionRequest);
 
         question.updateFromEntity(entity);
         log.info("Updating question: {}", question);

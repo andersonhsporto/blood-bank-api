@@ -1,8 +1,8 @@
 package com.api.bloodbankapi.screening.controller;
 
-import com.api.bloodbankapi.screening.dto.ProtocolDTO;
-import com.api.bloodbankapi.screening.dto.ScreeningDTO;
-import com.api.bloodbankapi.screening.dto.ScreeningQuestionDTO;
+import com.api.bloodbankapi.screening.dto.ProtocolResponse;
+import com.api.bloodbankapi.screening.dto.ScreeningResponse;
+import com.api.bloodbankapi.screening.dto.ScreeningQuestionResponse;
 import com.api.bloodbankapi.screening.service.ScreeningService;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -20,37 +20,37 @@ public class ScreeningController {
     private final ScreeningService service;
 
     @PostMapping("/{donorDocumentId}")
-    public ProtocolDTO createScreening(@PathVariable String donorDocumentId) {
+    public ProtocolResponse createScreening(@PathVariable String donorDocumentId) {
         log.info("Creating screening: {}", donorDocumentId);
         return service.createScreening(donorDocumentId);
     }
 
     @GetMapping("/{protocol}")
-    public ScreeningDTO findScreeningByProtocol(@PathVariable String protocol) {
+    public ScreeningResponse findScreeningByProtocol(@PathVariable String protocol) {
         log.info("Finding screening by protocol: {}", protocol);
         return service.findScreeningByProtocol(protocol);
     }
 
     @GetMapping("/active")
-    public List<ScreeningDTO> findActiveScreenings() {
+    public List<ScreeningResponse> findActiveScreenings() {
         log.info("Finding active screenings");
         return service.findActiveScreenings();
     }
 
     @GetMapping("/inactive")
-    public List<ScreeningDTO> findInactiveScreenings() {
+    public List<ScreeningResponse> findInactiveScreenings() {
         log.info("Finding inactive screenings");
         return service.findInactiveScreenings();
     }
 
     @GetMapping("/paging")
-    public List<ScreeningDTO> getScreeningsPage(@RequestParam int page, @RequestParam int size) {
+    public List<ScreeningResponse> getScreeningsPage(@RequestParam int page, @RequestParam int size) {
         log.info("Finding screenings page: {} size: {}", page, size);
         return service.findPage(page, size);
     }
 
     @GetMapping("/question/{protocol}")
-    public List<ScreeningQuestionDTO> getScreeningQuestions(@PathVariable @NotNull String protocol) {
+    public List<ScreeningQuestionResponse> getScreeningQuestions(@PathVariable @NotNull String protocol) {
         log.info("Finding screening questions by protocol: {}", protocol);
         return service.findScreeningQuestions(protocol);
     }

@@ -1,7 +1,7 @@
 package com.api.bloodbankapi.question.controller;
 
 import com.api.bloodbankapi.question.domain.QuestionService;
-import com.api.bloodbankapi.question.entity.QuestionDTO;
+import com.api.bloodbankapi.question.entity.QuestionRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
@@ -17,33 +17,33 @@ public class QuestionController {
     private final QuestionService service;
 
     @PostMapping()
-    public void createQuestion(@RequestBody QuestionDTO questionDTO) {
-        log.info("Creating question: {}", questionDTO);
-        service.save(questionDTO);
+    public void createQuestion(@RequestBody QuestionRequest questionRequest) {
+        log.info("Creating question: {}", questionRequest);
+        service.save(questionRequest);
     }
 
     @GetMapping("/{code}")
-    public QuestionDTO getQuestionByCode(@PathVariable String code) {
+    public QuestionRequest getQuestionByCode(@PathVariable String code) {
         log.info("Finding question by code: {}", code);
         return service.findByCode(code);
     }
 
     @GetMapping()
-    public List<QuestionDTO> getAllQuestions() {
+    public List<QuestionRequest> getAllQuestions() {
         log.info("Finding all questions");
         return service.findAll();
     }
 
     @GetMapping("/paging")
-    public List<QuestionDTO> getQuestionsPage(@RequestParam int page, @RequestParam int size) {
+    public List<QuestionRequest> getQuestionsPage(@RequestParam int page, @RequestParam int size) {
         log.info("Finding questions page: {} size: {}", page, size);
         return service.findPage(page, size);
     }
 
     @PutMapping("/{code}")
-    public void updateQuestion(@PathVariable String code, @RequestBody QuestionDTO questionDTO) {
-        log.info("Updating question: {}", questionDTO);
-        service.update(code, questionDTO);
+    public void updateQuestion(@PathVariable String code, @RequestBody QuestionRequest questionRequest) {
+        log.info("Updating question: {}", questionRequest);
+        service.update(code, questionRequest);
     }
 
     @PutMapping("/activate/{code}")

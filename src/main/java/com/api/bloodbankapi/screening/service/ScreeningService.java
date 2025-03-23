@@ -8,12 +8,12 @@ import com.api.bloodbankapi.donor.entity.Donor;
 import com.api.bloodbankapi.donor.repository.DonorRepository;
 import com.api.bloodbankapi.question.entity.Question;
 import com.api.bloodbankapi.question.repository.QuestionRepository;
-import com.api.bloodbankapi.screening.dto.ScreeningQuestionDTO;
+import com.api.bloodbankapi.screening.dto.ScreeningQuestionResponse;
 import com.api.bloodbankapi.screening.entity.ScreeningQuestion;
 import com.api.bloodbankapi.screening.repository.ScreeningPagingRepository;
 import com.api.bloodbankapi.screening.repository.ScreeningRepository;
-import com.api.bloodbankapi.screening.dto.ProtocolDTO;
-import com.api.bloodbankapi.screening.dto.ScreeningDTO;
+import com.api.bloodbankapi.screening.dto.ProtocolResponse;
+import com.api.bloodbankapi.screening.dto.ScreeningResponse;
 import com.api.bloodbankapi.screening.entity.Screening;
 import lombok.AllArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -41,7 +41,7 @@ public class ScreeningService {
 
     private final QuestionRepository questionRepository;
 
-    public ProtocolDTO createScreening(String donorDocumentId) {
+    public ProtocolResponse createScreening(String donorDocumentId) {
         var donorEntity = donorRepository.findByDocumentId(donorDocumentId)
                 .orElseThrow(() -> new DonorNotFoundCustomException("Donor not found with documentId: " + donorDocumentId));
 
@@ -55,14 +55,14 @@ public class ScreeningService {
         screeningRepository.save(screeningEntity);
         log.info("Screening created: {}", screeningEntity.getProtocol());
 
-        return new ProtocolDTO(screeningEntity.getProtocol(), screeningEntity.getDate(), screeningEntity.getStatus(), donorEntity.getObservation());
+        return new ProtocolResponse(screeningEntity.getProtocol(), screeningEntity.getDate(), screeningEntity.getStatus(), donorEntity.getObservation());
     }
 
-    public ScreeningDTO findScreeningByProtocol(String protocol) {
+    public ScreeningResponse findScreeningByProtocol(String protocol) {
         var screeningEntity = screeningRepository.findByProtocol(protocol)
                 .orElseThrow(() -> new ScreeningNotFoundCustomException("Screening not found with protocol: " + protocol));
 
-        return new ScreeningDTO(
+        return new ScreeningResponse(
                 screeningEntity.getId().toString(),
                 screeningEntity.getDonor().getName(),
                 screeningEntity.getProtocol(),
@@ -73,11 +73,11 @@ public class ScreeningService {
         );
     }
 
-    public List<ScreeningDTO> findActiveScreenings() {
+    public List<ScreeningResponse> findActiveScreenings() {
         return screeningRepository
                 .findByStatus(ScreeningStatus.PENDING)
                 .stream()
-                .map(screeningEntity -> new ScreeningDTO(
+                .map(screeningEntity -> new ScreeningResponse(
                         screeningEntity.getId().toString(),
                         screeningEntity.getDonor().getName(),
                         screeningEntity.getProtocol(),
@@ -89,9 +89,9 @@ public class ScreeningService {
                 .collect(Collectors.toList());
     }
 
-    public List<ScreeningDTO> findInactiveScreenings() {
+    public List<ScreeningResponse> findInactiveScreenings() {
         return screeningRepository.findByStatusNotContaining(ScreeningStatus.PENDING).stream()
-                .map(screeningEntity -> new ScreeningDTO(
+                .map(screeningEntity -> new ScreeningResponse(
                         screeningEntity.getId().toString(),
                         screeningEntity.getDonor().getName(),
                         screeningEntity.getProtocol(),
@@ -103,11 +103,11 @@ public class ScreeningService {
                 .collect(Collectors.toList());
     }
 
-    public List<ScreeningDTO> findPage(int page, int size) {
+    public List<ScreeningResponse> findPage(int page, int size) {
         Page<Screening> screeningPage = screeningPagingRepository.findAll(PageRequest.of(page, size, Sort.by("date")));
 
         return screeningPage.stream()
-                .map(screeningEntity -> new ScreeningDTO(
+                .map(screeningEntity -> new ScreeningResponse(
                         screeningEntity.getId().toString(),
                         screeningEntity.getDonor().getName(),
                         screeningEntity.getProtocol(),
@@ -168,7 +168,7 @@ public class ScreeningService {
                 now.getSecond());
     }
 
-    public List<ScreeningQuestionDTO> findScreeningQuestions(String protocol) {
+    public List<ScreeningQuestionResponse> findScreeningQuestions(String protocol) {
         var screeningEntity = screeningRepository.findByProtocol(protocol)
                 .orElseThrow(() -> new ScreeningNotFoundCustomException("Screening not found with protocol: " + protocol));
 
@@ -182,7 +182,7 @@ public class ScreeningService {
                 .allMatch(ScreeningQuestion::getIsAnswered);
 
         return questionsAndAnswers.entrySet().stream()
-                .map(entry -> new ScreeningQuestionDTO(questionsAndAnswers, answeredAllQuestions))
+                .map(entry -> new ScreeningQuestionResponse(questionsAndAnswers, answeredAllQuestions))
                 .toList();
     }
 }

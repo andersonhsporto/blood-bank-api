@@ -3,7 +3,7 @@ package com.api.bloodbankapi.donor.domain;
 import com.api.bloodbankapi.commons.exception.DonorDuplicatedCustomException;
 import com.api.bloodbankapi.commons.exception.DonorNotFoundCustomException;
 import com.api.bloodbankapi.donor.entity.Donor;
-import com.api.bloodbankapi.donor.entity.DonorDTO;
+import com.api.bloodbankapi.donor.entity.DonorRequest;
 import com.api.bloodbankapi.donor.repository.DonorPagingRepository;
 import com.api.bloodbankapi.donor.repository.DonorRepository;
 import jakarta.transaction.Transactional;
@@ -26,21 +26,21 @@ public class DonorService {
 
     private final DonorPagingRepository pagingRepository;
 
-    public DonorDTO findById(Long id) {
+    public DonorRequest findById(Long id) {
         return jpaRepository.findById(id)
-                .map(DonorDTO::fromEntity)
+                .map(DonorRequest::fromEntity)
                 .orElseThrow(() -> new DonorNotFoundCustomException());
     }
 
-    public List<DonorDTO> findAll() {
+    public List<DonorRequest> findAll() {
         return jpaRepository.findAll()
                 .stream()
-                .map(DonorDTO::fromEntity)
+                .map(DonorRequest::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public void save(DonorDTO donorDTO) {
-        Donor entity = DonorDTO.toEntity(donorDTO);
+    public void save(DonorRequest donorRequest) {
+        Donor entity = DonorRequest.toEntity(donorRequest);
 
         if (jpaRepository.existsByDocumentIdAndName(entity.getDocumentId(), entity.getName())) {
             throw new DonorDuplicatedCustomException();
@@ -49,25 +49,25 @@ public class DonorService {
         jpaRepository.save(entity);
     }
 
-    public DonorDTO findByDocumentId(String documentId) {
+    public DonorRequest findByDocumentId(String documentId) {
         return jpaRepository.findByDocumentId(documentId)
-                .map(DonorDTO::fromEntity)
+                .map(DonorRequest::fromEntity)
                 .orElseThrow(() -> new DonorNotFoundCustomException("Donor not found with documentId: " + documentId));
     }
 
-    public List<DonorDTO> findPage(int page, int size) {
+    public List<DonorRequest> findPage(int page, int size) {
         Page<Donor> donorPage = pagingRepository.findAll(PageRequest.of(page, size, Sort.by("name")));
 
         return donorPage.stream()
-                .map(DonorDTO::fromEntity)
+                .map(DonorRequest::fromEntity)
                 .collect(Collectors.toList());
     }
 
-    public void update(String documentId, DonorDTO donorDTO) {
+    public void update(String documentId, DonorRequest donorRequest) {
         Donor donor = jpaRepository.findByDocumentId(documentId)
                 .orElseThrow(() -> new DonorNotFoundCustomException("Donor not found with documentId: " + documentId));
 
-        Donor entity = DonorDTO.toEntity(donorDTO);
+        Donor entity = DonorRequest.toEntity(donorRequest);
 
         donor.updateFromEntity(entity);
 
