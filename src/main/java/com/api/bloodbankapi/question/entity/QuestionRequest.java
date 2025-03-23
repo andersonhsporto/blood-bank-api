@@ -1,22 +1,22 @@
 package com.api.bloodbankapi.question.entity;
 
-public record QuestionDTO(
+public record QuestionRequest(
         String code,
         String questionText,
         boolean mandatory,
         boolean active
 ) {
-    public static Question toEntity(QuestionDTO questionDTO) {
+    public static Question toEntity(QuestionRequest questionRequest) {
         return Question.builder()
-                .code(questionDTO.code())
-                .questionText(questionDTO.questionText())
-                .mandatory(questionDTO.mandatory())
+                .code(questionRequest.code())
+                .questionText(questionRequest.questionText())
+                .mandatory(questionRequest.mandatory())
                 .active(true)
                 .build();
     }
 
-    public static QuestionDTO fromEntity(Question entity) {
-        return new QuestionDTO(
+    public static QuestionRequest fromEntity(Question entity) {
+        return new QuestionRequest(
                 entity.getCode(),
                 entity.getQuestionText(),
                 entity.isMandatory(),
